@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Strain Finder</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #ffffff;
+}
+.wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 36px 20px 44px;
+}
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #4A7B63;
+  margin-bottom: 8px;
+}
+.title {
+  font-size: 21px;
+  font-weight: 700;
+  color: #1B3A2F;
+  line-height: 1.3;
+}
+.progress-track {
+  height: 4px;
+  background: #E2EDEA;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+.progress-fill {
+  height: 100%;
+  background: #1B3A2F;
+  border-radius: 99px;
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+}
+.q-meta {
+  font-size: 12px;
+  font-weight: 600;
+  color: #7DA892;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.q-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1B3A2F;
+  line-height: 1.4;
+  margin-bottom: 20px;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.opt {
+  width: 100%;
+  padding: 14px 18px;
+  background: #ffffff;
+  border: 1.5px solid #C5DDD5;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1B3A2F;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s, transform 0.1s;
+  line-height: 1.45;
+  font-family: inherit;
+}
+.opt:hover {
+  background: #EEF6F2;
+  border-color: #1B3A2F;
+}
+.opt:active {
+  transform: scale(0.98);
+}
+.opt.chosen {
+  background: #1B3A2F;
+  border-color: #1B3A2F;
+  color: #ffffff;
+}
+.result {
+  background: #1B3A2F;
+  border-radius: 16px;
+  padding: 30px 24px 26px;
+  text-align: center;
+  display: none;
+}
+.result.on {
+  display: block;
+  animation: rise 0.38s ease both;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.r-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #7DBFA0;
+  margin-bottom: 6px;
+}
+.r-name {
+  font-size: 27px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.r-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: #9FCFB8;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+.r-pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.13);
+  color: #C8E8D8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 4px 13px;
+  border-radius: 99px;
+  margin-bottom: 16px;
+}
+.r-desc {
+  font-size: 13px;
+  color: #9FCFB8;
+  line-height: 1.65;
+  margin-bottom: 22px;
+}
+.r-stars {
+  font-size: 12px;
+  color: #7DBFA0;
+  margin-bottom: 18px;
+  letter-spacing: 0.01em;
+}
+.r-cta {
+  display: inline-block;
+  background: #ffffff;
+  color: #1B3A2F;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 26px;
+  border-radius: 99px;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: opacity 0.15s;
+}
+.r-cta:hover {
+  opacity: 0.88;
+}
+.r-browse {
+  display: block;
+  margin: 12px auto 0;
+  color: #7DBFA0;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  letter-spacing: 0.01em;
+}
+.r-browse:hover {
+  color: #ffffff;
+}
+.restart {
+  display: block;
+  margin: 10px auto 0;
+  background: none;
+  border: none;
+  color: #4A7B63;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+}
+.restart:hover {
+  color: #7DBFA0;
+}
+</style>
+</head>
+<body>
+ 
+<div class="wrap">
+  <div class="header">
+    <div class="eyebrow">strain finder</div>
+    <div class="title">Which indica suits your evening?</div>
+  </div>
+ 
+  <div class="progress-track">
+    <div class="progress-fill" id="pFill"></div>
+  </div>
+ 
+  <div id="qBody">
+    <div class="q-meta" id="qMeta"></div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="qOpts"></div>
+  </div>
+ 
+  <div class="result" id="rCard">
+    <div class="r-eyebrow">your match</div>
+    <div class="r-name" id="rName"></div>
+    <div class="r-price" id="rPrice"></div>
+    <div class="r-pill" id="rPill"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="r-desc" id="rDesc"></div>
+    <a class="r-cta" id="rLink" href="https://mood.com/shop/benefits?filter=better-sleep" target="_blank">Shop now at Mood</a>
+    <a class="r-browse" href="https://mood.com/shop/benefits?filter=better-sleep" target="_blank">Browse all better rest products</a>
+    <button class="restart" onclick="restart()">Start over</button>
+  </div>
+</div>
+ 
+<script>
+var questions = [
+  {
+    text: "When do you usually start winding down for the evening?",
+    opts: [
+      { label: "Right after dinner. I like a long, gradual lead-up.", val: "early" },
+      { label: "About an hour before bed.", val: "mid" },
+      { label: "Pretty much when I get into bed.", val: "late" }
+    ]
+  },
+  {
+    text: "How familiar are you with cannabis wellness products?",
+    opts: [
+      { label: "Completely new to this.", val: "new" },
+      { label: "I have tried a few things here and there.", val: "some" },
+      { label: "I know my way around fairly well.", val: "exp" }
+    ]
+  },
+  {
+    text: "What kind of evening are you hoping for?",
+    opts: [
+      { label: "A slow, gentle drift into relaxation.", val: "gentle" },
+      { label: "Deep, settled, fully switched-off rest.", val: "deep" },
+      { label: "Calm and clear without feeling too heavy.", val: "light" }
+    ]
+  }
+];
+ 
+var products = {
+  ice_cream_cake: {
+    name: "Ice Cream Cake",
+    price: "From $13.00",
+    terpene: "Indica flower",
+    stars: "4.55 stars · 810 reviews",
+    desc: "A gentle, approachable indica flower for those easing into an evening wind-down. A great starting point with a calm, settled effect.",
+    url: "https://mood.com/product/ice-cream-cake"
+  },
+  sleep_gummies: {
+    name: "Sleep Gummies",
+    price: "From $29.00",
+    terpene: "15mg THC + 15mg CBN",
+    stars: "4.61 stars · 9,300+ reviews",
+    desc: "A deeply settling gummy formula combining THC and CBN for a long, restful night. Consistent, formulated, and backed by thousands of reviews.",
+    url: "https://mood.com/product/sleep-gummies"
+  },
+  counting_sheep: {
+    name: "Counting Sheep",
+    price: "From $17.00",
+    terpene: "Indica flower",
+    stars: "4.55 stars · 2,000+ reviews",
+    desc: "A go-to indica flower for full-body physical relaxation. Reliable, popular, and well-suited to a consistent evening routine.",
+    url: "https://mood.com/product/counting-sheep"
+  },
+  triple_zzz: {
+    name: "Hero Dose Triple Zzz Vape",
+    price: "From $30.00",
+    terpene: "Disposable vape",
+    stars: "4.4 stars · 120 reviews",
+    desc: "Fast-acting and convenient. Built for experienced users who want a calm, settled feeling quickly, without committing to a long edible window.",
+    url: "https://mood.com/product/hero-dose-triple-zzz-disposable-vape"
+  },
+  sleep_gummies_mf: {
+    name: "Sleep Gummies - Melatonin Free",
+    price: "From $35.00",
+    terpene: "15mg THC + 5mg CBN",
+    stars: "4.43 stars · 3,500+ reviews",
+    desc: "Rapid onset without melatonin. Includes ashwagandha, magnesium, L-theanine, and reishi for a calm, settled evening on your terms.",
+    url: "https://mood.com/product/sleep-gummies-melatonin-free"
+  }
+};
+ 
+var step = 0;
+var answers = [];
+ 
+function pick(a) {
+  var timing = a[0], exp = a[1], vibe = a[2];
+  if (exp === "new") return "ice_cream_cake";
+  if (vibe === "gentle" && exp !== "exp") return "ice_cream_cake";
+  if (vibe === "deep" && exp === "exp") return "sleep_gummies";
+  if (vibe === "deep") return "counting_sheep";
+  if (vibe === "light" && exp === "exp") return "triple_zzz";
+  if (timing === "late" && exp === "exp") return "sleep_gummies_mf";
+  if (exp === "exp") return "sleep_gummies_mf";
+  return "counting_sheep";
+}
+ 
+function render() {
+  var q = questions[step];
+  document.getElementById("qMeta").textContent = "Question " + (step + 1) + " of " + questions.length;
+  document.getElementById("qText").textContent = q.text;
+  document.getElementById("pFill").style.width = Math.round((step / questions.length) * 100) + "%";
+  var box = document.getElementById("qOpts");
+  box.innerHTML = "";
+  q.opts.forEach(function(o) {
+    var btn = document.createElement("button");
+    btn.className = "opt";
+    btn.textContent = o.label;
+    btn.onclick = function() { choose(o.val, btn); };
+    box.appendChild(btn);
+  });
+}
+ 
+function choose(val, btn) {
+  document.querySelectorAll(".opt").forEach(function(b) { b.onclick = null; });
+  btn.classList.add("chosen");
+  answers[step] = val;
+  setTimeout(function() {
+    step++;
+    if (step < questions.length) {
+      render();
+    } else {
+      showResult();
+    }
+  }, 300);
+}
+ 
+function showResult() {
+  document.getElementById("pFill").style.width = "100%";
+  document.getElementById("qBody").style.display = "none";
+  var key = pick(answers);
+  var p = products[key];
+  document.getElementById("rName").textContent = p.name;
+  document.getElementById("rPrice").textContent = p.price;
+  document.getElementById("rPill").textContent = p.terpene;
+  document.getElementById("rStars").textContent = p.stars;
+  document.getElementById("rDesc").textContent = p.desc;
+  var rLink = document.getElementById("rLink");
+  rLink.href = p.url;
+  var card = document.getElementById("rCard");
+  card.style.display = "block";
+  setTimeout(function() { card.classList.add("on"); }, 10);
+}
+ 
+function restart() {
+  step = 0;
+  answers = [];
+  var card = document.getElementById("rCard");
+  card.classList.remove("on");
+  card.style.display = "none";
+  document.getElementById("qBody").style.display = "block";
+  document.getElementById("pFill").style.width = "0%";
+  render();
+}
+ 
+render();
+</script>
+</body>
+</html>
